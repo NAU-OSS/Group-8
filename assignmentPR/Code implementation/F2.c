@@ -26,11 +26,9 @@ int main()
         //if the C string could hold at least the characteristic
     if(add(c1, n1, d1, c2, n2, d2, answer, 100))
     {
-        while(answer[index] != '\0')
-        {
-            printf(answer[index]);
-            index++;
-        }
+
+        printf("%s", answer);
+
     }
     else
     {
@@ -63,16 +61,18 @@ bool add(int c1, int n1, int d1,
   bool carry = false;
   int charResult = c1 + c2;
   int charLen = numOfDigits(charResult);
-  int *characteristic = intToDigitArray(charResult);
+  int characteristic[charLen];
+  intToDigitArray(charResult, characteristic);
   int mantissaResult;
-  int mantissaSpace = numOfDigits(charResult) + 1;
-  int *mantissa1 = mantissaToArray(n1, d1, mantissaSpace);
-  int *mantissa2 = mantissaToArray(n2, d2, mantissaSpace);
+  int mantissaSpace = len - numOfDigits(charResult) + 1;
+  int mantissa1[mantissaSpace];
+  int mantissa2[mantissaSpace];
+  mantissaResult = mantissaToArray(n1, d1, mantissaSpace, mantissa1) ||
+                   mantissaToArray(n2, d2, mantissaSpace, mantissa2);
+
 
   //base case, not enough to store characteristic
-  if(len <= charLen ||
-     mantissa1 == NULL ||
-     mantissa2 == NULL)
+  if(len <= charLen || !mantissaResult)
   {
     return false;
   }
@@ -83,14 +83,24 @@ bool add(int c1, int n1, int d1,
     index++;
   }
 
-  if(index < len - 1)
+  if(index < mantissaSpace)
   {
     result[index] = '.';
     index++;
 
-    while(index < len - 1)
+    while(index < mantissaSpace)
     {
-      mantissaResult = *(mantissa1 + index) + *(mantissa2 + index);
+      mantissaResult = 0;
+
+      if(mantissa1[index] != (int) '\0')
+      {
+        mantissaResult += mantissa1[index];
+      }
+
+      if(mantissa2[index] != (int) '\0')
+      {
+        mantissaResult += mantissa2[index];
+      }
 
       if(carry)
       {
@@ -104,7 +114,7 @@ bool add(int c1, int n1, int d1,
         carry = true;
       }
 
-      result[index] = mantissaResult;
+      result[index] = (char) mantissaResult;
 
       index++;
     }
@@ -161,17 +171,16 @@ int numOfDigits(int numberToCount)
 
 //Converts a mantissa (given as a fraction) into a int array with
 //only one digit per index
-int* mantissaToArray(int numerator, int denominator, int maxLength)
+bool mantissaToArray(int numerator, int denominator, int maxLength, int mantissaArray[])
 {
   int index = 0;
-  int mantissaArray[maxLength];
 
   if(numerator >= denominator)
   {
-    return NULL;
+    return false;
   }
 
-  while((numerator % denominator) > 0 && index < maxLength - 1)
+  while((numerator % denominator) > 0 && index < maxLength - 2)
   {
 
     numerator *= 10;
@@ -181,21 +190,18 @@ int* mantissaToArray(int numerator, int denominator, int maxLength)
 
   }
 
-  if(index < maxLength - 1)
-  {
     mantissaArray[index] = numerator / denominator;
-  }
+    mantissaArray[index + 1] = (int) '\0';
 
-  return mantissaArray;
+  return true;
 
 }
 
 
 //Converts a given int to a array with each index containing only one digit
-int* intToDigitArray(int number)
+void intToDigitArray(int number, int digitArray[])
 {
   int amountOfDigits = numOfDigits(number);
-  int digitArray[amountOfDigits];
   int place = 1;
   int power = 0;
   int index = 0;
@@ -212,7 +218,5 @@ int* intToDigitArray(int number)
     place /= 10;
     index++;
   }
-
-  return digitArray;
 
 }

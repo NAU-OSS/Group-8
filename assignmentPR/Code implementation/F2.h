@@ -7,5 +7,5 @@
 bool add(int, int, int, int, int, int, char[], int);
 bool subtract(int, int, int, int, int, int, char[], int);
 int numOfDigits(int);
-int* mantissaToArray(int, int, int);
-int* intToDigitArray(int);
+bool mantissaToArray(int, int, int, int[]);
+void intToDigitArray(int, int[]);
