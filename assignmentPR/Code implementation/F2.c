@@ -26,9 +26,12 @@ int main()
         //if the C string could hold at least the characteristic
     if(add(c1, n1, d1, c2, n2, d2, answer, 100))
     {
-
-        printf("%s", answer);
-
+        
+        while(answer[index] != '\0')
+        {
+            printf("%c", answer[index]);
+        }
+        
     }
     else
     {
@@ -154,7 +157,7 @@ bool subtract(int c1, int n1, int d1,
     int numResult;
     int tempResult[sizeNeeded];
     int charResult = c1 - c2;
-    bool carry = false;
+    bool borrow = false;
 
     result[resultArrIndex] = (char) charResult;
     resultArrIndex++;
@@ -172,9 +175,9 @@ bool subtract(int c1, int n1, int d1,
 
         numResult = numLSD1 - numLSD2;
 
-        if(carry)
+        if(borrow)
         {
-            numResult++;
+            numResult--;
             carry = false;
         }
 
