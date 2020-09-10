@@ -26,11 +26,9 @@ int main()
         //if the C string could hold at least the characteristic
     if(add(c1, n1, d1, c2, n2, d2, answer, 100))
     {
-        while(answer[index] != '\0')
-        {
-            printf(answer[index]);
-            index++;
-        }
+
+        printf("%s", answer);
+
     }
     else
     {
@@ -58,73 +56,72 @@ bool add(int c1, int n1, int d1,
          int c2, int n2, int d2,
          char result[], int len)
 {
+
+  int index = 0;
+  bool carry = false;
+  int charResult = c1 + c2;
+  int charLen = numOfDigits(charResult);
+  int characteristic[charLen];
+  intToDigitArray(charResult, characteristic);
+  int mantissaResult;
+  int mantissaSpace = len - numOfDigits(charResult) + 1;
+  int mantissa1[mantissaSpace];
+  int mantissa2[mantissaSpace];
+  mantissaResult = mantissaToArray(n1, d1, mantissaSpace, mantissa1) ||
+                   mantissaToArray(n2, d2, mantissaSpace, mantissa2);
+
+
   //base case, not enough to store characteristic
-  if(len <= 1)
+  if(len <= charLen || !mantissaResult)
   {
     return false;
   }
 
-  int sizeNeeded = ((n1 + n2) / 10) + 1;
-  int resultArrIndex = 0;
-  int tempArrIndex = 0;
-  int numLSD1;
-  int numLSD2;
-  int numResult;
-  int tempResult[sizeNeeded];
-  int charResult = c1 + c2;
-  bool carry = false;
-
-
-
-  result[resultArrIndex] = (char) charResult;
-  resultArrIndex++;
-  result[resultArrIndex] = '.';
-
-  //loop while denominators are not zero, takes off the end of each
-  //numerator, then adds them
-  //update: divide denominators by 10
-  while((d1 > 0 || d2 > 0) && tempArrIndex < len - 1)
+  while(index < charLen)
   {
+    result[index] = (char) characteristic[index];
+    index++;
+  }
 
-    numLSD1 = n1 % 10;
-    numLSD2 = n2 % 10;
+  if(index < mantissaSpace)
+  {
+    result[index] = '.';
+    index++;
 
-    numResult = numLSD1 + numLSD2;
-
-    if(carry)
+    while(index < mantissaSpace)
     {
-      numResult++;
-      carry = false;
+      mantissaResult = 0;
+
+      if(mantissa1[index] != (int) '\0')
+      {
+        mantissaResult += mantissa1[index];
+      }
+
+      if(mantissa2[index] != (int) '\0')
+      {
+        mantissaResult += mantissa2[index];
+      }
+
+      if(carry)
+      {
+        mantissaResult++;
+        carry = false;
+      }
+
+      if(mantissaResult > 9)
+      {
+        mantissaResult %= 10;
+        carry = true;
+      }
+
+      result[index] = (char) mantissaResult;
+
+      index++;
     }
-
-    if(numResult > 9)
-    {
-      numResult %= 10;
-      carry = true;
-    }
-
-    tempResult[tempArrIndex] = numResult;
-
-    tempArrIndex++;
-    d1 /= 10;
-    d2 /= 10;
-
-    n1 /= 10;
-    n2 /= 10;
 
   }
 
-  while(resultArrIndex < len - 1)
-  {
-
-    result[resultArrIndex] = (char) tempResult[tempArrIndex];
-
-    resultArrIndex++;
-    tempArrIndex--;
-
-  }
-
-  result[resultArrIndex] = '\0';
+  result[index] = '\0';
 
   return true;
 
@@ -213,4 +210,81 @@ bool subtract(int c1, int n1, int d1,
     result[resultArrIndex] = '\0';
 
     return true;
+}
+
+
+//---------------Helper Functions------------------\\
+
+
+//Counts the number of digits in a given int
+//Zero is counted as 1 digit
+int numOfDigits(int numberToCount)
+{
+  int amount = 1;
+
+  if(numberToCount < 0)
+  {
+    numberToCount *= -1;
+  }
+
+  while(numberToCount > 9)
+  {
+    numberToCount /= 10;
+    amount++;
+  }
+
+  return amount;
+}
+
+
+//Converts a mantissa (given as a fraction) into a int array with
+//only one digit per index
+bool mantissaToArray(int numerator, int denominator, int maxLength, int mantissaArray[])
+{
+  int index = 0;
+
+  if(numerator >= denominator)
+  {
+    return false;
+  }
+
+  while((numerator % denominator) > 0 && index < maxLength - 2)
+  {
+
+    numerator *= 10;
+    mantissaArray[index] = numerator / denominator;
+    numerator %= denominator;
+    index++;
+
+  }
+
+    mantissaArray[index] = numerator / denominator;
+    mantissaArray[index + 1] = (int) '\0';
+
+  return true;
+
+}
+
+
+//Converts a given int to a array with each index containing only one digit
+void intToDigitArray(int number, int digitArray[])
+{
+  int amountOfDigits = numOfDigits(number);
+  int place = 1;
+  int power = 0;
+  int index = 0;
+
+  while(power < amountOfDigits - 1)
+  {
+    place *= 10;
+    power++;
+  }
+
+  while(index < amountOfDigits)
+  {
+    digitArray[index] = number / place;
+    place /= 10;
+    index++;
+  }
+
 }
