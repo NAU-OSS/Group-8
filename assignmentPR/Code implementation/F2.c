@@ -35,7 +35,7 @@ int main()
     }
     else
     {
-        printf("Array size was not large enough");
+        printf("Array size was not large enough or invalid mantissa");
     }
 
 
