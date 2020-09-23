@@ -1,7 +1,7 @@
 # Group8 Website - Content, Issues, Requests and Edits
 
 ## How to contribute
-See the Group8 [contributing.md](https://github.com/XXXX/CONTRIBUTING.md)
+See the Group8 [contributing.md](https://github.com/NAU-OSS/Group-8/blob/master/contributing.md)
 
 ## Repository specific guidelines
 * For general issues, please use the Issues 
